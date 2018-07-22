@@ -15,17 +15,29 @@
     <div class="panel">
         <div class="panel-body box-layout">
             <div class="col-xs-12 va-m">
+                <div class="row">
+                    <?php foreach ($tags as $utm => $value) { ?>
+                        <div class="col-xs-12 col-sm-3">
+
+                            <span class="label" style="background-color:#787a7a"><?php echo $utm; ?></span>
+                            &nbsp;<small><?php echo $value; ?></small>
+                        </div>
+                        <?php
+                    }
+                    ?>
+                </div>
+                <hr>
                 <h5 class="text-white dark-md fw-sb mb-xs">
+                    <small class="pull-right">
+                        <?php echo $view['translator']->trans('mautic.core.date.from'); ?>
+                        <strong style="color:#666"><?php echo $dateFrom; ?></strong>
+                        <?php echo $view['translator']->trans('mautic.core.date.to'); ?>
+                        <strong style="color:#666"><?php echo $dateTo; ?></strong>
+                    </small>
                     <span class="fa fa-line-chart"></span>
                     <?php echo $view['translator']->trans('plugin.extendee.analytics.overview'); ?>
                     <i id="analytics-loading" class="fa fa-spin fa-spinner"></i>
                 </h5>
-                <p>
-                    <?php foreach ($tags as $utm => $value) {
-                     echo $utm.': '.$value . ' / ';
-                    }
-                    ?>
-                </p>
             </div>
         </div>
 
@@ -118,8 +130,12 @@
     var metrics = '<?php echo implode(',', array_keys($rawMetrics)); ?>';
     var filters = '<?php echo $filters ?>';
     var currency = '<?php echo $keys['currency']; ?>';
-    if(typeof analyticsReady == 'undefined') {
+    var dateFrom = '<?php echo (new \Mautic\CoreBundle\Helper\DateTimeHelper($dateFrom))->toLocalString('Y-m-d'); ?>';
+    var dateTo = '<?php echo (new \Mautic\CoreBundle\Helper\DateTimeHelper($dateTo))->toLocalString('Y-m-d'); ?>';
+    if (typeof analyticsReady == 'undefined') {
         var analyticsReady = false;
     }
 </script>
-<?php echo $view['assets']->includeScript('plugins/MauticExtendeeAnalyticsBundle/Assets/js/analytics.js?time='.time()); ?>
+<?php echo $view['assets']->includeScript(
+    'plugins/MauticExtendeeAnalyticsBundle/Assets/js/analytics.js?time='.time()
+); ?>

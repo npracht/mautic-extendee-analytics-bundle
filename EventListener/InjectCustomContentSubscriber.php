@@ -18,6 +18,7 @@ use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
 use MauticPlugin\MauticExtendeeAnalyticsBundle\Integration\EAnalyticsIntegration;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -73,7 +74,6 @@ class InjectCustomContentSubscriber extends CommonSubscriber
     {
         /** @var EAnalyticsIntegration $eAnalyticsIntegration */
         $eAnalyticsIntegration = $this->integrationHelper->getIntegrationObject('EAnalytics');
-
         if ((false === $eAnalyticsIntegration || !$eAnalyticsIntegration->getIntegrationSettings()->getIsPublished(
                 )) || $customContentEvent->getContext() != 'details.stats.graph.below'
         ) {
@@ -85,7 +85,6 @@ class InjectCustomContentSubscriber extends CommonSubscriber
         }
 
         $parameters = $customContentEvent->getVars();
-
         $utmTags     = [];
 
         foreach ($parameters as $key=>$parameter) {
@@ -100,6 +99,7 @@ class InjectCustomContentSubscriber extends CommonSubscriber
         if (empty($utmTags)) {
             return;
         }
+
         $filters = '';
         $tags = [];
         foreach ($utmTags as $key=>$utmTag) {
@@ -107,6 +107,16 @@ class InjectCustomContentSubscriber extends CommonSubscriber
             $tags[$tagKey] = $utmTag;
             $filters.= 'ga:'.strtolower($tagKey).'=='.$utmTag.';';
         }
+
+        $dateFrom = '';
+        $dateTo = '';
+        if (!empty($parameters['dateRangeForm'])) {
+            /** @var FormView $dateRangeForm */
+            $dateRangeForm = $parameters['dateRangeForm'];
+            $dateFrom = $dateRangeForm->children['date_from']->vars['data'];
+            $dateTo = $dateRangeForm->children['date_to']->vars['data'];
+        }
+
         // Remove last line
         $filters  = substr_replace($filters, '', -1);
         $filters = str_replace('ga:content', 'ga:adContent', $filters);
@@ -119,6 +129,9 @@ class InjectCustomContentSubscriber extends CommonSubscriber
                 'filters'    => $filters,
                 'metrics'    => $this->getMetricsFromConfig($keys),
                 'rawMetrics' => $this->getRawMetrics(),
+                'dateFrom' => $dateFrom,
+                'dateTo' => $dateTo,
+
             ]
         );
 

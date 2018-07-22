@@ -40,8 +40,8 @@ function getData () {
         'ids': ids,
         'dimensions': 'ga:sourceMedium',
         'metrics': metrics,
-        'start-date': '30daysAgo',
-        'end-date': 'today',
+        'start-date': dateFrom,
+        'end-date': dateTo,
         'filters': filters
     })
         .then(function (response) {
