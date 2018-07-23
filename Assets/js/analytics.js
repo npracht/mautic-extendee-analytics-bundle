@@ -36,6 +36,27 @@ Mautic.eAnalytics.ready(function () {
 
 function getData () {
     document.getElementById("analytics-loading").style.display = 'none';
+
+    var dataChart = new gapi.analytics.googleCharts.DataChart({
+        query: {
+            'ids': ids,
+            metrics: metricsGraph,
+            dimensions: 'ga:date',
+            'start-date': dateFrom,
+            'end-date': dateTo,
+            'filters': filters
+        },
+        chart: {
+            container: 'chart-container',
+            type: 'LINE',
+            options: {
+                width: '100%',
+                height:'100px'
+            }
+        }
+    }).execute();
+
+
     query({
         'ids': ids,
         'dimensions': 'ga:sourceMedium',
@@ -60,7 +81,7 @@ function getData () {
                         case "TIME":
                             symbol = 'm';
                             results[row['name']] = fmtMSS((parseInt(results[row['name']])));
-                            console.log(results[row['name']]);
+                            //console.log(results[row['name']]);
                             break;
 
                     }

@@ -119,7 +119,19 @@
                 }
             }
             ?>
-
+            <div class="panel-body box-layout pt-20 pb-0">
+                <div class="col-xs-4 va-m">
+                    <h5 class="text-white dark-md fw-sb mb-xs">
+                        <span class="fa fa-line-chart"></span>
+                        <?php echo $view['translator']->trans('plugin.extendee.analytics.graph.by.days'); ?>
+                    </h5>
+                </div>
+                <div class="col-xs-8 va-m">
+                </div>
+            </div>
+            <div class="col-xs-12">
+                <div id="chart-container"></div>
+            </div>
         </div>
     </div>
 </div>
@@ -132,6 +144,10 @@
     var currency = '<?php echo $keys['currency']; ?>';
     var dateFrom = '<?php echo (new \Mautic\CoreBundle\Helper\DateTimeHelper($dateFrom))->toLocalString('Y-m-d'); ?>';
     var dateTo = '<?php echo (new \Mautic\CoreBundle\Helper\DateTimeHelper($dateTo))->toLocalString('Y-m-d'); ?>';
+    var metricsGraph = 'ga:sessions';
+    <?php if (!empty($metrics['ecommerce'])) { ?>
+    metricsGraph = metricsGraph+',ga:transactions';
+    <?php } ?>
     if (typeof analyticsReady == 'undefined') {
         var analyticsReady = false;
     }
