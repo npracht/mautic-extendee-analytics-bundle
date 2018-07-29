@@ -80,7 +80,7 @@ class InjectCustomContentSubscriber extends CommonSubscriber
             return;
         }
         $keys = $eAnalyticsIntegration->getKeys();
-        if (empty($keys['clientId']) || empty($keys['viewId'])) {
+        if (!$keys['display_details_graph'] || empty($keys['clientId']) || empty($keys['viewId'])) {
             return;
         }
 

@@ -131,6 +131,20 @@ class EAnalyticsIntegration extends AbstractIntegration
                 ]
             );
 
+            $builder->add(
+                'display_details_graph',
+                'yesno_button_group',
+                [
+                    'label'      => $this->translator->trans('plugin.extendee.analytics.display.graphs.detail'),
+                    'label_attr' => ['class' => 'control-label'],
+                    'attr'       => [
+                        'class' => 'form-control',
+                    ],
+                    'data'=> !empty($data['display_details_graph']) ? true: false,
+                    'required' => false,
+                ]
+            );
+
         }
     }
 
