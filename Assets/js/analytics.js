@@ -12,6 +12,9 @@ if (!Mautic.eAnalytics) {
 }
 
 Mautic.eAnalytics.ready(function () {
+    mQuery('.analytics-choose select').change(function () {
+        getData(true);
+    })
 
     Mautic.eAnalytics.auth.authorize({
         container: 'auth-button',
@@ -34,8 +37,26 @@ Mautic.eAnalytics.ready(function () {
     }
 });
 
-function getData () {
+function getData (byChoosen) {
     document.getElementById("analytics-loading").style.display = 'none';
+
+    if (byChoosen == true) {
+        var selectedFilters = [];
+        mQuery('.analytics-choose select').each(function () {
+            var opts = mQuery(this).val();
+            var key = mQuery(this).attr('name');
+            var filters = [];
+            if (opts) {
+                opts.forEach(function (entry) {
+                    filters.push('ga:' + key + '==' + entry);
+                });
+                selectedFilters.push(filters.join(','));
+            }
+
+        })
+        filters = selectedFilters.join(';');
+        console.log(filters);
+    }
 
     var dataChart = new gapi.analytics.googleCharts.DataChart({
         query: {
@@ -51,11 +72,11 @@ function getData () {
             type: 'LINE',
             options: {
                 width: '100%',
-                height:'100px'
+                height: '100px'
             }
         }
-    }).execute();
-
+    })
+    dataChart.execute();
 
     query({
         'ids': ids,
@@ -105,7 +126,7 @@ function getData () {
         });
 }
 
-function fmtMSS(s){return(s-(s%=60))/60+(9<s?':':':0')+s}
+function fmtMSS (s) {return (s - (s %= 60)) / 60 + (9 < s ? ':' : ':0') + s}
 
 /**
  * Extend the Embed APIs `Mautic.eAnalytics.report.Data` component to

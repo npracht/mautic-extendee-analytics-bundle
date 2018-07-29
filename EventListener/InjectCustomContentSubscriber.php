@@ -121,7 +121,7 @@ class InjectCustomContentSubscriber extends CommonSubscriber
         $filters  = substr_replace($filters, '', -1);
         $filters = str_replace('ga:content', 'ga:adContent', $filters);
         $content = $this->templateHelper->getTemplating()->render(
-            'MauticExtendeeAnalyticsBundle:Integration:analytics-details.html.php',
+            'MauticExtendeeAnalyticsBundle:Analytics:analytics-details.html.php',
             [
                 'tags'   => $tags,
                 'entityId'   => $entityId,
