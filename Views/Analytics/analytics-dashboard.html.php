@@ -9,23 +9,21 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-
-<div class="col-xs-12 va-m mb-20">
+<div class="analytics-case">
     <?php echo $view->render(
         'MauticExtendeeAnalyticsBundle:Analytics:header.html.php',
         ['tags' => $tags]
     ); ?>
+
+    <?php echo $view->render(
+        'MauticExtendeeAnalyticsBundle:Analytics:data.html.php',
+        [
+            'metrics'  => $metrics,
+            'dateFrom' => $dateFrom,
+            'dateTo'   => $dateTo,
+        ]
+    ); ?>
 </div>
-
-<?php echo $view->render(
-    'MauticExtendeeAnalyticsBundle:Analytics:data.html.php',
-    [
-        'metrics'  => $metrics,
-        'dateFrom' => $dateFrom,
-        'dateTo'   => $dateTo,
-    ]
-); ?>
-
 <script>
     var CLIENT_ID = '<?php echo $keys['clientId'] ?>';
     var ids = 'ga:<?php echo $keys['viewId']; ?>';

@@ -12,8 +12,9 @@ if (!Mautic.eAnalytics) {
 }
 
 Mautic.eAnalytics.ready(function () {
-    mQuery('.analytics-choose select').change(function () {
-        getData(true);
+
+    mQuery('.analytics-header select').change(function () {
+        getData(mQuery(this).parents('.analytics-case:first'));
     })
 
     Mautic.eAnalytics.auth.authorize({
@@ -22,27 +23,33 @@ Mautic.eAnalytics.ready(function () {
     });
 
     if (Mautic.eAnalytics.auth.isAuthorized()) {
-        getData();
+        loadData();
     }
     else {
         Mautic.eAnalytics.auth.on('success', function (response) {
-            getData();
+            loadData();
         }).on('logout', function (response) {
         }).on('needsAuthorization', function (response) {
-            document.getElementById("analytics-loading").style.display = 'none';
-            document.getElementById("analytics-auth").style.display = 'block';
+            mQuery(".analytics-loading").hide();
+            mQuery(".analytics-auth").show();
         }).on('error', function (response) {
-            console.log('error');
+            console.log(response);
         })
     }
 });
 
-function getData (byChoosen) {
-    document.getElementById("analytics-loading").style.display = 'none';
+function loadData() {
+    mQuery('.analytics-case').each(function () {
+        getData(mQuery(this));
+    })
+}
 
+function getData (parent) {
+    parent.find(".analytics-loading").hide();
+    byChoosen = true;
     if (byChoosen == true) {
         var selectedFilters = [];
-        mQuery('.analytics-choose select').each(function () {
+        parent.find('.analytics-header select').each(function () {
             var opts = mQuery(this).val();
             var key = mQuery(this).attr('name');
             var filters = [];
@@ -55,7 +62,6 @@ function getData (byChoosen) {
 
         })
         filters = selectedFilters.join(';');
-        console.log(filters);
     }
 
     var dataChart = new gapi.analytics.googleCharts.DataChart({
@@ -68,7 +74,7 @@ function getData (byChoosen) {
             'filters': filters
         },
         chart: {
-            container: 'chart-container',
+            container: parent.find('.chart-container').attr('id'),
             type: 'LINE',
             options: {
                 width: '100%',
@@ -76,6 +82,7 @@ function getData (byChoosen) {
             }
         }
     })
+
     dataChart.execute();
 
     query({
@@ -100,6 +107,7 @@ function getData (byChoosen) {
                             symbol = currency;
                             break;
                         case "TIME":
+                            console.log(results[row['name']]);
                             symbol = 'm';
                             results[row['name']] = fmtMSS((parseInt(results[row['name']])));
                             //console.log(results[row['name']]);
@@ -113,15 +121,15 @@ function getData (byChoosen) {
                     if (result == parseFloat(result) && result != parseInt(result)) {
                         result = parseFloat(result).toFixed(1);
                     }
-                    if (result && document.getElementById(key) != null) {
-                        document.getElementById(key).innerHTML = result + '' + symbols[key];
+                    var classname = key.replace('ga:', '');
+                    if (result && parent.find('.'+classname).length) {
+                        parent.find('.'+classname).text(result + '' + symbols[key]);
                     }
                 }
-                document.getElementById("eanalytics-stats").style.display = 'block';
+                parent.find(".eanalytics-stats").show()
             }
             else {
-                document.getElementById("eanalytics-stats-no-results").style.display = 'block';
-
+                parent.find(".eanalytics-stats-no-results").show();
             }
         });
 }
