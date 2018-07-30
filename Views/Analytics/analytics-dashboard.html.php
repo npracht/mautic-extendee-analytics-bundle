@@ -12,7 +12,10 @@
 <div class="analytics-case">
     <?php echo $view->render(
         'MauticExtendeeAnalyticsBundle:Analytics:header.html.php',
-        ['tags' => $tags]
+        [
+            'tags' => $tags,
+            'params'=> isset($params) ? $params : []
+        ]
     ); ?>
 
     <?php echo $view->render(
@@ -21,6 +24,7 @@
             'metrics'  => $metrics,
             'dateFrom' => $dateFrom,
             'dateTo'   => $dateTo,
+            'params'=> isset($params) ? $params : []
         ]
     ); ?>
 </div>

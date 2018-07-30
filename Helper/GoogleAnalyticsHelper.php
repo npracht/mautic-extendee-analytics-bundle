@@ -77,7 +77,7 @@ class GoogleAnalyticsHelper
     /**
      * @return array
      */
-    public function setUtmTagsFromChannels()
+    public function setUtmTagsFromChannels($dateFrom, $dateTo)
     {
         // already exists
         if (!empty($this->utmTags)) {
@@ -90,7 +90,14 @@ class GoogleAnalyticsHelper
 
         foreach ($tables as $table) {
             $q->select('e.id, e.utm_tags')
-                ->from(MAUTIC_TABLE_PREFIX.$table, 'e');
+                ->from(MAUTIC_TABLE_PREFIX.$table, 'e')
+                ->where(
+                    $q->expr()->gt('e.date_modified', ':dateFrom'),
+                    $q->expr()->lt('e.date_modified', ':dateTo')
+                )
+                ->setParameter('dateFrom', $dateFrom)
+                ->setParameter('dateTo', $dateTo);
+            ;
             $utmTags = $q->execute()->fetchAll();
             if ($utmTags) {
                 foreach ($utmTags as $utmTag) {

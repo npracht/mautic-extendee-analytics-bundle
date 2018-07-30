@@ -12,7 +12,11 @@
 <div class="analytics-header">
     <div class="col-xs-12 va-m mb-20">
         <div class="row">
-            <?php foreach ($tags as $utm => $value) { ?>
+            <?php foreach ($tags as $utm => $value) {
+                if(isset($params) && empty($params[$utm])){
+                    continue;
+                }
+                ?>
                 <div class="col-xs-12 col-sm-3">
                     <label><?php echo $utm; ?></label>
                     <select name="<?php echo $utm; ?>" class="form-control" autocomplete="false" multiple="multiple">

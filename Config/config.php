@@ -28,6 +28,12 @@ return [
                 ],
             ],
         ],
+        'forms' =>[
+            'mautic.plugin.extendee.form.type.dashboard.analytics' => [
+                'class'     => \MauticPlugin\MauticExtendeeAnalyticsBundle\Form\Type\DashboardExtendeeAnalyticsWidgetType::class,
+                'alias'     => 'dashboard_extendee_analytics',
+            ],
+        ],
         'others'=>[
             'mautic.plugin.extendee.analytics.helper'=> [
                 'class' => MauticPlugin\MauticExtendeeAnalyticsBundle\Helper\GoogleAnalyticsHelper::class,

@@ -34,7 +34,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
      * @var string
      */
     protected $types = [
-        'extendee.analytics' => [],
+        'extendee.analytics' => [
+            'formAlias' => 'dashboard_extendee_analytics',
+        ],
     ];
 
     /**
@@ -67,8 +69,9 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
             //if (!$event->isCached()) {
-                $this->analyticsHelper->setUtmTagsFromChannels();
+                $this->analyticsHelper->setUtmTagsFromChannels((new DateTimeHelper($params['dateFrom']))->toLocalString('Y-m-d'), (new DateTimeHelper($params['dateTo']))->toLocalString('Y-m-d'));
                 $event->setTemplateData([
+                    'params' => $params,
                     'tags'   =>     $this->analyticsHelper->getFlatUtmTags(),
                     'keys'       => $this->analyticsHelper->getAnalyticsFeatures(),
                     'filters'    => $this->analyticsHelper->getFilter(),

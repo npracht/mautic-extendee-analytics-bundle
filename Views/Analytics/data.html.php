@@ -89,6 +89,7 @@
             }
         }
         ?>
+        <?php if(!isset($params) || !empty($params['sessionGraph'])): ?>
         <div class="panel-body box-layout pt-20 pb-0">
             <div class="col-xs-4 va-m">
                 <h5 class="text-white dark-md fw-sb mb-xs">
@@ -102,5 +103,6 @@
         <div class="col-xs-12">
             <div class="chart-container" id="chart-container-<?php echo uniqid(mt_rand());?>"></div>
         </div>
+        <?php endif; ?>
     </div>
 </div>

@@ -86,6 +86,7 @@ trait GoogleAnalyticsTrait
                         continue;
                     }
                     if (!isset($flat[$key][$tag])) {
+                        $key = str_replace('utmName', 'utmCampaign', $key);
                         $key = str_replace('utmContent', 'utmAdContent', $key);
                         $key = strtolower(str_replace('utm', '', $key));
                         $flat[$key][$tag] = $tag;
