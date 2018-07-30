@@ -28,7 +28,7 @@
                 <div class="row">
                     <div class="col-xs-12 va-m mb-20">
                         <?php echo $view->render(
-                            'MauticExtendeeAnalyticsBundle:Analytics:header-labels.html.php',
+                            'MauticExtendeeAnalyticsBundle:Analytics:header.html.php',
                             ['tags' => $tags]
                         ); ?>
                     </div>

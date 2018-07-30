@@ -23,6 +23,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 class GoogleAnalyticsHelper
 {
     use GoogleAnalyticsTrait;
+
     /**
      * @var IntegrationHelper
      */
@@ -68,10 +69,10 @@ class GoogleAnalyticsHelper
         RouterInterface $router
     ) {
 
-        $this->integrationHelper  = $integrationHelper;
-        $this->translator         = $translator;
-        $this->entityManager      = $entityManager;
-        $this->router             = $router;
+        $this->integrationHelper = $integrationHelper;
+        $this->translator        = $translator;
+        $this->entityManager     = $entityManager;
+        $this->router            = $router;
     }
 
     /**
@@ -96,8 +97,7 @@ class GoogleAnalyticsHelper
                     $q->expr()->lt('e.date_modified', ':dateTo')
                 )
                 ->setParameter('dateFrom', $dateFrom)
-                ->setParameter('dateTo', $dateTo);
-            ;
+                ->setParameter('dateTo', $dateTo);;
             $utmTags = $q->execute()->fetchAll();
             if ($utmTags) {
                 foreach ($utmTags as $utmTag) {
@@ -108,7 +108,16 @@ class GoogleAnalyticsHelper
                 }
             }
         }
+
         return $this->utmTags;
+    }
+
+    /**
+     * @param array $utmTags
+     */
+    public function setUtmTags(array $utmTags, $channel, $channelId)
+    {
+        $this->utmTags[$channel][$channelId] = $utmTags;
     }
 
 }

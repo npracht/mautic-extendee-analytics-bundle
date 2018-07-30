@@ -17,6 +17,7 @@ use Mautic\CoreBundle\EventListener\CommonSubscriber;
 use Mautic\CoreBundle\Helper\TemplatingHelper;
 use Mautic\CoreBundle\Translation\Translator;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
+use MauticPlugin\MauticExtendeeAnalyticsBundle\Helper\GoogleAnalyticsHelper;
 use MauticPlugin\MauticExtendeeAnalyticsBundle\Integration\EAnalyticsIntegration;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Routing\RouterInterface;
@@ -41,23 +42,31 @@ class InjectCustomContentSubscriber extends CommonSubscriber
     private $metrics = [];
 
     /**
+     * @var GoogleAnalyticsHelper
+     */
+    private $analyticsHelper;
+
+    /**
      * ButtonSubscriber constructor.
      *
      * @param IntegrationHelper              $integrationHelper
      * @param TemplatingHelper               $templateHelper
      * @param Translator|TranslatorInterface $translator
      * @param RouterInterface                $router
+     * @param GoogleAnalyticsHelper          $analyticsHelper
      */
     public function __construct(
         IntegrationHelper $integrationHelper,
         TemplatingHelper $templateHelper,
         TranslatorInterface $translator,
-        RouterInterface $router
+        RouterInterface $router,
+        GoogleAnalyticsHelper $analyticsHelper
     ) {
         $this->integrationHelper = $integrationHelper;
         $this->templateHelper    = $templateHelper;
         $this->translator        = $translator;
         $this->router            = $router;
+        $this->analyticsHelper   = $analyticsHelper;
     }
 
     public static function getSubscribedEvents()
@@ -72,25 +81,24 @@ class InjectCustomContentSubscriber extends CommonSubscriber
      */
     public function injectViewCustomContent(CustomContentEvent $customContentEvent)
     {
-        /** @var EAnalyticsIntegration $eAnalyticsIntegration */
-        $eAnalyticsIntegration = $this->integrationHelper->getIntegrationObject('EAnalytics');
-        if ((false === $eAnalyticsIntegration || !$eAnalyticsIntegration->getIntegrationSettings()->getIsPublished(
-                )) || $customContentEvent->getContext() != 'details.stats.graph.below'
+        if (!$this->analyticsHelper->enableEAnalyticsIntegration() || $customContentEvent->getContext(
+            ) != 'details.stats.graph.below'
         ) {
             return;
         }
-        $keys = $eAnalyticsIntegration->getKeys();
+        $keys = $this->analyticsHelper->getAnalyticsFeatures();
         if (!$keys['display_details_graph'] || empty($keys['clientId']) || empty($keys['viewId'])) {
             return;
         }
 
         $parameters = $customContentEvent->getVars();
-        $utmTags     = [];
-
-        foreach ($parameters as $key=>$parameter) {
-            if(method_exists($parameter, 'getUtmTags')){
+        $utmTags    = [];
+        $channel    = '';
+        foreach ($parameters as $key => $parameter) {
+            if (method_exists($parameter, 'getUtmTags')) {
                 $entityId = $parameter->getId();
                 $utmTags  = $parameter->getUtmTags();
+                $channel  = $key;
                 break;
             }
         }
@@ -99,38 +107,31 @@ class InjectCustomContentSubscriber extends CommonSubscriber
         if (empty($utmTags)) {
             return;
         }
-
         $filters = '';
-        $tags = [];
-        foreach ($utmTags as $key=>$utmTag) {
-            $tagKey = str_replace('utm', '', $key);
-            $tags[$tagKey] = $utmTag;
-            $filters.= 'ga:'.strtolower($tagKey).'=='.$utmTag.';';
-        }
+        $tags    = [];
+
+        $this->analyticsHelper->setUtmTags($utmTags, $channel, $entityId);
 
         $dateFrom = '';
-        $dateTo = '';
+        $dateTo   = '';
         if (!empty($parameters['dateRangeForm'])) {
             /** @var FormView $dateRangeForm */
             $dateRangeForm = $parameters['dateRangeForm'];
-            $dateFrom = $dateRangeForm->children['date_from']->vars['data'];
-            $dateTo = $dateRangeForm->children['date_to']->vars['data'];
+            $dateFrom      = $dateRangeForm->children['date_from']->vars['data'];
+            $dateTo        = $dateRangeForm->children['date_to']->vars['data'];
         }
 
-        // Remove last line
-        $filters  = substr_replace($filters, '', -1);
-        $filters = str_replace('ga:content', 'ga:adContent', $filters);
         $content = $this->templateHelper->getTemplating()->render(
             'MauticExtendeeAnalyticsBundle:Analytics:analytics-details.html.php',
             [
-                'tags'   => $tags,
-                'entityId'   => $entityId,
-                'keys'       => $keys,
-                'filters'    => $filters,
-                'metrics'    => $this->getMetricsFromConfig($keys),
-                'rawMetrics' => $this->getRawMetrics(),
-                'dateFrom' => $dateFrom,
-                'dateTo' => $dateTo,
+                'tags'       => $this->analyticsHelper->getFlatUtmTags(),
+                'keys'       => $this->analyticsHelper->getAnalyticsFeatures(),
+                'filters'    => $this->analyticsHelper->getFilter(),
+                'metrics'    => $this->analyticsHelper->getMetricsFromConfig(),
+                'rawMetrics' => $this->analyticsHelper->getRawMetrics(),
+                'dateFrom'   => $dateFrom,
+                'dateTo'     => $dateTo,
+                'multiple'   => false,
 
             ]
         );

@@ -19,6 +19,7 @@ return [
                     'mautic.helper.templating',
                     'translator',
                     'router',
+                    'mautic.plugin.extendee.analytics.helper'
                 ],
             ],
             'mautic.plugin.extendee.analytics.dashboard.subscriber' => [
