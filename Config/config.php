@@ -32,6 +32,9 @@ return [
         'forms' =>[
             'mautic.plugin.extendee.form.type.dashboard.analytics' => [
                 'class'     => \MauticPlugin\MauticExtendeeAnalyticsBundle\Form\Type\DashboardExtendeeAnalyticsWidgetType::class,
+                'arguments' => [
+                    'mautic.plugin.extendee.analytics.helper'
+                ],
                 'alias'     => 'dashboard_extendee_analytics',
             ],
         ],
@@ -43,6 +46,7 @@ return [
                     'translator',
                     'doctrine.orm.entity_manager',
                     'router',
+                    'mautic.helper.user'
                 ],
             ],
         ],

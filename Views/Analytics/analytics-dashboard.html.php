@@ -10,13 +10,18 @@
  */
 ?>
 <div class="analytics-case">
-    <?php echo $view->render(
-        'MauticExtendeeAnalyticsBundle:Analytics:header.html.php',
-        [
-            'tags' => $tags,
-            'params'=> isset($params) ? $params : []
-        ]
-    ); ?>
+    <?php
+    if (!empty($params['dynamic_filter']) && !empty($params['filters'])) {
+        echo $view->render(
+            'MauticExtendeeAnalyticsBundle:Analytics:header.html.php',
+            [
+                'tags'   => $tags,
+                'params' => $params,
+                'widget' => $widget,
+            ]
+        );
+    }
+    ?>
 
     <?php echo $view->render(
         'MauticExtendeeAnalyticsBundle:Analytics:data.html.php',
@@ -24,11 +29,13 @@
             'metrics'  => $metrics,
             'dateFrom' => $dateFrom,
             'dateTo'   => $dateTo,
-            'params'=> isset($params) ? $params : []
+            'params'   => isset($params) ? $params : [],
+            'widget'   => $widget,
         ]
     ); ?>
 </div>
 <script>
+
     var CLIENT_ID = '<?php echo $keys['clientId'] ?>';
     var ids = 'ga:<?php echo $keys['viewId']; ?>';
     var metrics = '<?php echo implode(',', array_keys($rawMetrics)); ?>';

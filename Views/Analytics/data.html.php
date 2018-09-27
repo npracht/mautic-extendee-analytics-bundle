@@ -8,6 +8,15 @@
  *
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
+
+$columnClass = "col-xs-12";
+if($widget->getWidth() > 25)
+{
+    $columnClass.=' col-sm-4';
+}else{
+    $columnClass.=' pb-5';
+}
+
 ?>
 
 <div class="analytics-data">
@@ -29,7 +38,7 @@
         if (!empty($metrics['overview'])) {
             foreach ($metrics['overview'] as $metric => $label) {
                 ?>
-                <div class="col-sm-4 col-xs-6">
+                <div class="<?php echo $columnClass; ?>">
                     <h3 class="pull-left"><span class="label label-primary <?php echo str_replace('ga:', '', $metric); ?>"
                                                 ></span></h3>
                     <span class="mt-5 pt-2 ml-10 pull-left"><?php echo $label; ?></span>
@@ -54,7 +63,7 @@
             <?php
             foreach ($metrics['ecommerce'] as $metric => $label) {
                 ?>
-                <div class="col-sm-4 col-xs-6">
+                <div class="<?php echo $columnClass; ?>">
                     <h3 class="pull-left"><span class="label label-success <?php echo str_replace('ga:', '', $metric); ?>"
                                                 ></span></h3>
                     <span class="mt-5 pt-2 ml-10 pull-left"><?php echo $label; ?></span>
@@ -80,7 +89,7 @@
             <?php
             foreach ($metrics['goals'] as $metric => $label) {
                 ?>
-                <div class="col-sm-4 col-xs-6">
+                <div class="<?php echo $columnClass; ?>"">
                     <h3 class="pull-left"><span class="label label-info <?php echo str_replace('ga:', '', $metric); ?>"
                                                 ></span></h3>
                     <span class="mt-5 pt-2 ml-10 pull-left"><?php echo $label; ?></span>

@@ -11,11 +11,32 @@ if (!Mautic.eAnalytics) {
     Mautic.eAnalytics = gapi.analytics;
 }
 
+Mautic.extendeeAnalyticsConfigSave = function (element) {
+    var data = element.find('form').formToArray();
+    var obj =  element;
+    Mautic.ajaxActionRequest('plugin:extendeeAnalytics:configSave', data, function (response) {
+        console.log('test');
+        if(response.content) {
+            obj.find('analytics-header').remove();
+            obj.prepend(response.content);
+
+        }
+    });
+}
+
+
 Mautic.eAnalytics.ready(function () {
 
+    mQuery('.analytics-header select').each(function () {
+        Mautic.activateChosenSelect(mQuery(this));
+    });
+    mQuery('.analytics-header select').trigger('chosen:updated');
     mQuery('.analytics-header select').change(function () {
-        getData(mQuery(this).parents('.analytics-case:first'));
+        var parent = mQuery(this).parents('.analytics-case:first');
+        Mautic.extendeeAnalyticsConfigSave(parent);
+        getData(parent);
     })
+
 
     Mautic.eAnalytics.auth.authorize({
         container: 'auth-button',
@@ -49,19 +70,21 @@ function getData (parent) {
     byChoosen = true;
     if (byChoosen == true) {
         var selectedFilters = [];
-        parent.find('.analytics-header select').each(function () {
-            var opts = mQuery(this).val();
-            var key = mQuery(this).attr('name');
-            var filters = [];
-            if (opts) {
-                opts.forEach(function (entry) {
-                    filters.push('ga:' + key + '==' + entry);
-                });
-                selectedFilters.push(filters.join(','));
-            }
+        if (parent.find('.analytics-header select').length) {
+            parent.find('.analytics-header select').each(function () {
+                var opts = mQuery(this).val();
+                var key = mQuery(this).attr('name');
+                var filters = [];
+                if (opts) {
+                    opts.forEach(function (entry) {
+                        filters.push('ga:' + key + '==' + entry);
+                    });
+                    selectedFilters.push(filters.join(','));
+                }
 
-        })
-        filters = selectedFilters.join(';');
+            })
+            filters = selectedFilters.join(';');
+        }
     }
 
     var dataChart = new gapi.analytics.googleCharts.DataChart({

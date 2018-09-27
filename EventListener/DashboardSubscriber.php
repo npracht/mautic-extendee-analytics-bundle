@@ -70,15 +70,19 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $params = $widget->getParams();
             //if (!$event->isCached()) {
                 $this->analyticsHelper->setUtmTagsFromChannels((new DateTimeHelper($params['dateFrom']))->toLocalString('Y-m-d'), (new DateTimeHelper($params['dateTo']))->toLocalString('Y-m-d'));
-                $event->setTemplateData([
+            $this->analyticsHelper->setDynamicFilter($params);
+
+            $event->setTemplateData([
                     'params' => $params,
-                    'tags'   =>     $this->analyticsHelper->getFlatUtmTags(),
+                    'tags'   =>     $this->analyticsHelper->getFlatUtmTags($params),
                     'keys'       => $this->analyticsHelper->getAnalyticsFeatures(),
                     'filters'    => $this->analyticsHelper->getFilter(),
                     'metrics'    => $this->analyticsHelper->getMetricsFromConfig(),
                     'rawMetrics' => $this->analyticsHelper->getRawMetrics(),
                     'dateFrom' =>  (new DateTimeHelper($params['dateFrom']))->toLocalString('Y-m-d'),
                     'dateTo' =>  (new DateTimeHelper($params['dateTo']))->toLocalString('Y-m-d'),
+                    'widget' => $widget,
+                    'user' => $this->analyticsHelper->getUserHelper()->getUser(true),
                 ]);
             //}
 

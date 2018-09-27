@@ -15,6 +15,39 @@ namespace MauticPlugin\MauticExtendeeAnalyticsBundle\Helper;
 trait GoogleAnalyticsTrait
 {
 
+    private $dynamicFilter;
+
+    /**
+     * @param $tag
+     */
+    public function tagToLabel($tag)
+    {
+        $this->translator->trans(
+            'mautic.email.campaign_'.str_replace(
+                ['campaign', 'adcontent'],
+                ['name', 'content'],
+                $tag
+            )
+        );
+    }
+
+    /**
+     * Dynamic content utm tags is json_array, others are serialized array
+     * This function return array of tags
+     *
+     * @param $utmTags
+     *
+     * @return mixed
+     */
+    public function transformUtmTagsFromDBToArray($utmTags)
+    {
+        try {
+            return \GuzzleHttp\json_decode($utmTags);
+        } catch (\Exception $exception) {
+            return unserialize($utmTags);
+        }
+    }
+
     /**
      * @return array
      */
@@ -66,6 +99,7 @@ trait GoogleAnalyticsTrait
             if (empty($this->analyticsFeatures['clientId']) || empty($this->analyticsFeatures['viewId'])) {
                 return false;
             }
+
             return true;
         }
 
@@ -82,19 +116,22 @@ trait GoogleAnalyticsTrait
         foreach ($this->utmTags as $fields) {
             foreach ($fields as $utmTags) {
                 foreach ($utmTags as $key => $tag) {
+
                     if (empty($tag)) {
                         continue;
                     }
                     if (!isset($flat[$key][$tag])) {
-                        $key = str_replace('utmName', 'utmCampaign', $key);
-                        $key = str_replace('utmContent', 'utmAdContent', $key);
-                        $key = strtolower(str_replace('utm', '', $key));
+                        $key              = str_replace('utmName', 'utmCampaign', $key);
+                        $key              = str_replace('utmContent', 'utmAdContent', $key);
+                        $key              = strtolower(str_replace('utm', '', $key));
+                        if (is_array($this->dynamicFilter) && empty($this->dynamicFilter['dynamic_filter']) && empty($this->dynamicFilter[$key]) && !in_array($tag, $this->dynamicFilter[$key])) {
+                            continue;
+                        }
                         $flat[$key][$tag] = $tag;
                     }
                 }
             }
         }
-
         return $flat;
     }
 
@@ -105,7 +142,7 @@ trait GoogleAnalyticsTrait
             $filterImp = [];
             foreach ($utmTag as $tag) {
                 //$filter.= 'ga:'.strtolower($key).'=='.$utmTag.';';
-                $filterImp[] = 'ga:'.$key.'=='.$tag.'';
+                $filterImp[] = 'ga:'.$key.'=='.urlencode($tag).'';
             }
             $filter .= implode(',', $filterImp).';';
         }
@@ -113,7 +150,6 @@ trait GoogleAnalyticsTrait
 
         return str_replace('ga:content', 'ga:adContent', $filter);
     }
-
 
 
     /**
@@ -137,6 +173,14 @@ trait GoogleAnalyticsTrait
     public function getAnalyticsFeatures()
     {
         return $this->analyticsFeatures;
+    }
+
+    /**
+     * @param array $dynamicFilter
+     */
+    public function setDynamicFilter($dynamicFilter)
+    {
+        $this->dynamicFilter = $dynamicFilter;
     }
 
 }
