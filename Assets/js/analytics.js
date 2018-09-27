@@ -14,14 +14,14 @@ if (!Mautic.eAnalytics) {
 Mautic.extendeeAnalyticsConfigSave = function (element) {
     var data = element.find('form').formToArray();
     var obj =  element;
-    Mautic.ajaxActionRequest('plugin:extendeeAnalytics:configSave', data, function (response) {
+    /*Mautic.ajaxActionRequest('plugin:extendeeAnalytics:configSave', data, function (response) {
         console.log('test');
         if(response.content) {
             obj.find('analytics-header').remove();
             obj.prepend(response.content);
 
         }
-    });
+    });*/
 }
 
 
