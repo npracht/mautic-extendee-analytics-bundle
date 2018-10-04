@@ -112,7 +112,9 @@ trait GoogleAnalyticsTrait
      */
     public function getFlatUtmTags()
     {
-        $flat = [];
+        if (!empty($this->flatTags)) {
+            return $this->flatTags;
+        }
         foreach ($this->utmTags as $fields) {
             foreach ($fields as $utmTags) {
                 foreach ($utmTags as $key => $tag) {
@@ -124,7 +126,7 @@ trait GoogleAnalyticsTrait
                         $key              = str_replace('utmName', 'utmCampaign', $key);
                         $key              = str_replace('utmContent', 'utmAdContent', $key);
                         $key              = strtolower(str_replace('utm', '', $key));
-                        if (is_array($this->dynamicFilter) && empty($this->dynamicFilter['dynamic_filter']) && empty($this->dynamicFilter[$key]) && !in_array($tag, $this->dynamicFilter[$key])) {
+                        if (empty($this->dynamicFilter[$key]) && is_array($this->dynamicFilter[$key]) && !in_array($tag, $this->dynamicFilter[$key])) {
                             continue;
                         }
                         $flat[$key][$tag] = $tag;
@@ -132,7 +134,8 @@ trait GoogleAnalyticsTrait
                 }
             }
         }
-        return $flat;
+        $this->flatTags = $flat;
+        return $this->flatTags;
     }
 
     public function getFilter()

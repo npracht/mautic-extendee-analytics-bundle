@@ -67,26 +67,11 @@ function loadData() {
 
 function getData (parent) {
     parent.find(".analytics-loading").hide();
-    byChoosen = true;
-    if (byChoosen == true) {
         var selectedFilters = [];
-        if (parent.find('.analytics-header select').length) {
-            parent.find('.analytics-header select').each(function () {
-                var opts = mQuery(this).val();
-                var key = mQuery(this).attr('name');
-                var filters = [];
-                if (opts) {
-                    opts.forEach(function (entry) {
-                        filters.push('ga:' + key + '==' + entry);
-                    });
-                    selectedFilters.push(filters.join(','));
-                }
-
-            })
-            filters = selectedFilters.join(';');
-        }
+    if (!parent.data('filters')) {
+       return;
     }
-
+    filters = parent.data('filters');
     var dataChart = new gapi.analytics.googleCharts.DataChart({
         query: {
             'ids': ids,

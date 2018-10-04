@@ -9,7 +9,7 @@
  * @license     GNU/GPLv3 http://www.gnu.org/licenses/gpl-3.0.html
  */
 ?>
-<div class="analytics-case">
+<div class="analytics-case" data-filters="<?php echo $filters ?>">
     <?php
     if (!empty($params['dynamic_filter']) && !empty($params['filters'])) {
         echo $view->render(

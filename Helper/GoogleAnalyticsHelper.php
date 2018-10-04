@@ -15,8 +15,6 @@ namespace MauticPlugin\MauticExtendeeAnalyticsBundle\Helper;
 use Doctrine\ORM\EntityManager;
 use Mautic\CoreBundle\Helper\UserHelper;
 use Mautic\PluginBundle\Helper\IntegrationHelper;
-use MauticPlugin\MauticExtendeeAnalyticsBundle\Integration\EAnalyticsIntegration;
-use MauticPlugin\MauticRecombeeBundle\Integration\RecombeeIntegration;
 use Symfony\Component\Form\FormFactory;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
@@ -35,9 +33,7 @@ class GoogleAnalyticsHelper
      */
     private $translator;
 
-    private $metrics;
-
-    private $analyticsFeatures;
+    private $flatTags;
 
     /**
      * @var EntityManager
@@ -94,9 +90,8 @@ class GoogleAnalyticsHelper
     public function setUtmTagsFromChannels($dateFrom = null, $dateTo = null)
     {
         // already exists
-        if (!empty($this->utmTags)) {
-            return $this->utmTags;
-        }
+
+        $this->utmTags = [];
 
         $q = $this->entityManager->getConnection()->createQueryBuilder();
 
@@ -123,8 +118,18 @@ class GoogleAnalyticsHelper
                 }
             }
         }
-
         return $this->utmTags;
+    }
+
+    public function setUtmTagsFromFilter($filters)
+    {
+        $this->flatTags = [];
+        $utmTags = ['source', 'medium', 'campaign', 'adcontent'];
+        foreach ($utmTags as $utmTag) {
+            if (!empty($filters[$utmTag])) {
+                $this->flatTags[$utmTag] = $filters[$utmTag];
+            }
+        }
     }
 
     /**
@@ -133,6 +138,14 @@ class GoogleAnalyticsHelper
     public function setUtmTags(array $utmTags, $channel, $channelId)
     {
         $this->utmTags[$channel][$channelId] = $utmTags;
+    }
+
+    /**
+     *
+     */
+    public function resetUtmTags()
+    {
+        $this->utmTags = [];
     }
 
     /**

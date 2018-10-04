@@ -81,6 +81,7 @@ class InjectCustomContentSubscriber extends CommonSubscriber
      */
     public function injectViewCustomContent(CustomContentEvent $customContentEvent)
     {
+        return;
         if (!$this->analyticsHelper->enableEAnalyticsIntegration() || $customContentEvent->getContext(
             ) != 'details.stats.graph.below'
         ) {

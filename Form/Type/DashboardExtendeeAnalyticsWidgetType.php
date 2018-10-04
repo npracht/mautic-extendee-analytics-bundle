@@ -44,35 +44,6 @@ class DashboardExtendeeAnalyticsWidgetType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'dynamic_filter',
-            YesNoButtonGroupType::class,
-            [
-                'label' => 'mautic.plugin.recombee.form.dynamic.filter',
-            ]
-        );
-
-        $builder->add(
-            'filters',
-            ChoiceType::class,
-            [
-                'choices' => [
-                    'source'    => 'mautic.email.campaign_source',
-                    'medium'    => 'mautic.email.campaign_medium',
-                    'campaign'  => 'mautic.email.campaign_name',
-                    'adcontent' => 'mautic.email.campaign_content',
-                ],
-                'expanded'    => false,
-                'multiple'    => true,
-                'label'       => 'mautic.plugin.recombee.form.filters',
-                'label_attr'  => ['class' => ''],
-                'empty_value' => false,
-                'required'    => true,
-                'attr'=>[
-                    'data-show-on' => '{"widget_params_dynamic_filter_1":"checked"}',
-                ]
-            ]
-        );
 
         $this->analyticsHelper->setUtmTagsFromChannels();
         $utmTags = $this->analyticsHelper->getFlatUtmTags();
@@ -89,7 +60,6 @@ class DashboardExtendeeAnalyticsWidgetType extends AbstractType
                     'empty_value' => false,
                     'required'    => false,
                     'attr'=>[
-                        'data-show-on' => '{"widget_params_dynamic_filter_0":"checked"}',
                     ]
                 ]
             );

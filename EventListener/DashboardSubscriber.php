@@ -69,12 +69,12 @@ class DashboardSubscriber extends MainDashboardSubscriber
             $widget = $event->getWidget();
             $params = $widget->getParams();
             //if (!$event->isCached()) {
-                $this->analyticsHelper->setUtmTagsFromChannels((new DateTimeHelper($params['dateFrom']))->toLocalString('Y-m-d'), (new DateTimeHelper($params['dateTo']))->toLocalString('Y-m-d'));
-            $this->analyticsHelper->setDynamicFilter($params);
-
+  //              $this->analyticsHelper->setUtmTagsFromChannels((new DateTimeHelper($params['dateFrom']))->toLocalString('Y-m-d'), (new DateTimeHelper($params['dateTo']))->toLocalString('Y-m-d'));
+//            $this->analyticsHelper->setDynamicFilter($params);
+            $this->analyticsHelper->setUtmTagsFromFilter($params);
             $event->setTemplateData([
                     'params' => $params,
-                    'tags'   =>     $this->analyticsHelper->getFlatUtmTags($params),
+                    'tags'   =>     $this->analyticsHelper->getFlatUtmTags(),
                     'keys'       => $this->analyticsHelper->getAnalyticsFeatures(),
                     'filters'    => $this->analyticsHelper->getFilter(),
                     'metrics'    => $this->analyticsHelper->getMetricsFromConfig(),
@@ -83,9 +83,8 @@ class DashboardSubscriber extends MainDashboardSubscriber
                     'dateTo' =>  (new DateTimeHelper($params['dateTo']))->toLocalString('Y-m-d'),
                     'widget' => $widget,
                     'user' => $this->analyticsHelper->getUserHelper()->getUser(true),
-                ]);
+                ], true);
             //}
-
             $event->setTemplate('MauticExtendeeAnalyticsBundle:Analytics:analytics-dashboard.html.php');
             $event->stopPropagation();
         }
