@@ -17,8 +17,6 @@ Extension for Mautic from Extendee family www.extendee.com Translations and impr
 
 3. See new integrations EAnalytics
 
-Note: This plugin require pull request [Inject new custom content hooks below graphs](https://github.com/mautic/mautic/pull/6016) from Mautic repository. Hope will merged in upcomming Mautic 2.14.
-
 ### Setup integration
 
 Plugin require  [Google Analalytics Embed API](https://developers.google.com/analytics/devguides/reporting/embed/v1/). You have to follow [Google API setup](https://developers.google.com/api-client-library/javascript/start/start-js#Setup), generate Client ID and take View ID of your Google Analytics view.
